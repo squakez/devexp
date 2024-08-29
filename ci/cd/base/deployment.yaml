@@ -1,0 +1,54 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: test
+  namespace: default
+spec:
+  selector:
+    matchLabels:
+      camel.apache.org/integration: test
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        camel.apache.org/integration: test
+    spec:
+      containers:
+      - env:
+        - name: NAMESPACE
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.namespace
+        - name: POD_NAME
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.name
+        image: 10.100.107.57/camel-k/camel-k-kit-cr7i4qre34ms73a1htm0@sha256:18ef4d3011aeddd03d8e346b1f2e0be34fd1bf95b6bc80ea3aabdafb1c2caced
+        name: integration
+        resources:
+          limits:
+            cpu: 500m
+            memory: 512Mi
+          requests:
+            cpu: 125m
+            memory: 128Mi
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop:
+            - ALL
+          runAsNonRoot: false
+          seccompProfile:
+            type: RuntimeDefault
+      restartPolicy: Always
+      securityContext:
+        runAsNonRoot: false
+        seccompProfile:
+          type: RuntimeDefault
+      terminationGracePeriodSeconds: 30
